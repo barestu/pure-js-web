@@ -24,35 +24,48 @@ function fetchIssues() {
 }
 
 function saveIssue(e) {
-  e.preventDefault();
-  let issueId = chance.guid()
-  let issueDesc = document.getElementById('descInput').value
-  let issueSeverity = document.getElementById('severityInput').value
-  let issueAssignedTo = document.getElementById('assignedInput').value
-  let issueStatus = 'Open'
-
+  e.preventDefault();  
+  let issues = JSON.parse(localStorage.getItem('issues')) || []
   let issue = {
-    id: issueId,
-    description: issueDesc,
-    severity: issueSeverity,
-    assignedTo: issueAssignedTo,
-    status: issueStatus
+    id: chance.guid(),
+    description: document.getElementById('descInput').value,
+    severity: document.getElementById('severityInput').value,
+    assignedTo: document.getElementById('assignedInput').value,
+    status: 'Open'
   }
 
-  if (localStorage.getItem('inputForm' === null)) {
-    let issues = []
-    issues.push(issue)
-    localStorage.setItem('issues', JSON.stringify(issues))
-  } else {
-    let issues = JSON.parse(localStorage.getItem('issues')) || []
-    console.log('here', issue);
-    issues.push(issue)
-    localStorage.setItem('issues', JSON.stringify(issues))
-  }
+  issues.push(issue)
+  localStorage.setItem('issues', JSON.stringify(issues))
 
   document.getElementById('inputForm').reset()
   fetchIssues()
   e.preventDefault();
+}
+
+function setStatusClosed(id) {
+  let issues = JSON.parse(localStorage.getItem('issues'))
+
+  for (let i = 0; i < issues.length; i++) {
+    if (issues[i].id === id) {
+      issues[i].status = 'Closed'
+    }
+  }
+
+  localStorage.setItem('issues', JSON.stringify(issues))
+  fetchIssues()
+}
+
+function deleteIssue(id) {
+  let issues = JSON.parse(localStorage.getItem('issues'))
+
+  for (let i = 0; i < issues.length; i++) {
+    if (issues[i].id === id) {
+      issues.splice(i, 1)
+    }
+  }
+
+  localStorage.setItem('issues', JSON.stringify(issues))
+  fetchIssues()
 }
 
 document.getElementById('inputForm').addEventListener('submit', saveIssue)
